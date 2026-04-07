@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Form – Webhook Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --surface: #141416;
+      --border: #2a2a2e;
+      --text: #e4e4e7;
+      --text-muted: #71717a;
+      --accent: #22d3ee;
+      --accent-glow: rgba(34, 211, 238, 0.15);
+      --success: #10b981;
+      --error: #f43f5e;
+      --radius: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-glow), transparent),
+        radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.08), transparent);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 580px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      padding: 0.4rem 0.8rem;
+      border-radius: 100px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+
+    .webhook-config {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .webhook-config label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .webhook-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .webhook-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .webhook-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .form-group label span {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    input, select, textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.9rem center;
+      padding-right: 2.5rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--accent), #06b6d4);
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0a0a0b;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Response Panel */
+    .response-panel {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .response-panel.visible {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .response-panel.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .response-panel.error {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .response-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .response-panel.success .response-header {
+      color: var(--success);
+    }
+
+    .response-panel.error .response-header {
+      color: var(--error);
+    }
+
+    .response-body {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 0.75rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .footer code {
+      font-family: 'Space Mono', monospace;
+      background: var(--surface);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 500px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="badge">Webhook Testing</div>
+      <h1>Lead Qualifier Form</h1>
+      <p class="subtitle">Test your n8n workflow by submitting sample lead data</p>
+    </header>
+
+    <div class="card">
+      <!-- Webhook URL Config -->
+      <div class="webhook-config">
+        <label for="webhookUrl">Your n8n Webhook URL</label>
+        <input 
+          type="url" 
+          id="webhookUrl" 
+          class="webhook-input"
+          placeholder="https://n8n.asktheets.com/webhook/lead-qualifier"
+          value="https://n8n.asktheets.com/webhook/lead-qualifier"
+        >
+      </div>
+
+      <!-- Lead Form -->
+      <form id="leadForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" placeholder="Jane Smith" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="jane@company.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="company">Company</label>
+            <input type="text" id="company" name="company" placeholder="Acme Corp">
+          </div>
+
+          <div class="form-group">
+            <label for="role">Role / Title</label>
+            <input type="text" id="role" name="role" placeholder="Marketing Director">
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone <span>(optional)</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="+1 555 123 4567">
+          </div>
+
+          <div class="form-group">
+            <label for="budget">Budget</label>
+            <select id="budget" name="budget">
+              <option value="">Select range...</option>
+              <option value="< $1,000">Under $1,000</option>
+              <option value="$1,000 - $5,000">$1,000 – $5,000</option>
+              <option value="$5,000 - $10,000">$5,000 – $10,000</option>
+              <option value="$10,000 - $25,000">$10,000 – $25,000</option>
+              <option value="$25,000+">$25,000+</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="employees">Company Size</label>
+            <select id="employees" name="employees">
+              <option value="">Select size...</option>
+              <option value="1-10">1–10 employees</option>
+              <option value="11-50">11–50 employees</option>
+              <option value="51-200">51–200 employees</option>
+              <option value="201-500">201–500 employees</option>
+              <option value="500+">500+ employees</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="timeline">Timeline</label>
+            <select id="timeline" name="timeline">
+              <option value="">Select timeline...</option>
+              <option value="Immediately">Immediately</option>
+              <option value="This month">This month</option>
+              <option value="Next quarter">Next quarter</option>
+              <option value="Just researching">Just researching</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="use_case">Use Case / What You Need</label>
+            <input type="text" id="use_case" name="use_case" placeholder="Automate lead qualification and CRM workflows">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="message">Additional Message <span>(optional)</span></label>
+            <textarea id="message" name="message" placeholder="Tell us more about your project or questions..."></textarea>
+          </div>
+        </div>
+
+        <input type="hidden" name="source" value="webhook-test-form">
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          Submit Lead to Webhook
+        </button>
+      </form>
+
+      <!-- Response Panel -->
+      <div id="responsePanel" class="response-panel">
+        <div class="response-header">
+          <span id="responseIcon"></span>
+          <span id="responseTitle"></span>
+        </div>
+        <pre class="response-body" id="responseBody"></pre>
+      </div>
+    </div>
+
+    <footer class="footer">
+      Form posts to your n8n webhook as <code>application/json</code>
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById('leadForm');
+    const webhookInput = document.getElementById('webhookUrl');
+    const submitBtn = document.getElementById('submitBtn');
+    const responsePanel = document.getElementById('responsePanel');
+    const responseIcon = document.getElementById('responseIcon');
+    const responseTitle = document.getElementById('responseTitle');
+    const responseBody = document.getElementById('responseBody');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const webhookUrl = webhookInput.value.trim();
+      if (!webhookUrl) {
+        alert('Please enter your n8n webhook URL');
+        return;
+      }
+
+      // Gather form data
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+
+      // Update UI
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      responsePanel.classList.remove('visible', 'success', 'error');
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        // Show success
+        responsePanel.classList.add('visible', 'success');
+        responseIcon.textContent = '✓';
+        responseTitle.textContent = `Success (${response.status})`;
+        responseBody.textContent = JSON.stringify(data, null, 2);
+
+      } catch (error) {
+        // Show error
+        responsePanel.classList.add('visible', 'error');
+        responseIcon.textContent = '✕';
+        responseTitle.textContent = 'Request Failed';
+        responseBody.textContent = error.message + '\n\nPossible causes:\n• Webhook URL is incorrect\n• Workflow not activated in n8n\n• CORS not enabled (see note below)\n\nTip: For local testing, use n8n\'s "Test URL" button instead.';
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Lead to Webhook';
+    });
+  </script>
+</body>
+</html>
